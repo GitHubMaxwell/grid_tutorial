@@ -1,88 +1,227 @@
 <!DOCTYPE html>
 <html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>CSS Grid Image Gallery!</title>
+  </head>
 
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta http-equiv="X-UA-Compatible" content="ie=edge">
-  <title>CSS Grid Image Gallery!</title>
-</head>
-
-<body>
-
-  <div class="overlay">
-    <div class="overlay-inner">
-      <button class="close">× Close</button>
-      <img>
+  <body>
+    <div class="overlay">
+      <div class="overlay-inner">
+        <button class="close">× Close</button> <img />
+      </div>
     </div>
-  </div>
 
-  <section class="gallery">
-  </section>
+    <section class="gallery">
+      <!-- generate then with JS -->
+      <!-- css object-fi / like background-size:cover -->
+    </section>
 
+    <style>
+      * {
+        box-sizing: border-box;
+      }
 
-  <style>
-    * {
-      box-sizing: border-box;
-    }
+      body {
+        padding: 50px;
+        font-family: sans-serif;
+        background: linear-gradient(to right, #f93d66, #6d47d9);
+      }
 
-    body {
-      padding: 50px;
-      font-family: sans-serif;
-      background: linear-gradient(to right, #F93D66, #6D47D9);
-    }
+      h1,
+      h2,
+      h3,
+      h4,
+      h5,
+      h6 {
+        margin: 0 0 5px 0;
+      }
 
-    h1,
-    h2,
-    h3,
-    h4,
-    h5,
-    h6 {
-      margin: 0 0 5px 0;
-    }
+      p {
+        margin: 0 0 20px 0;
+      }
 
-    p {
-      margin: 0 0 20px 0;
-    }
+      .close {
+        background: none;
+        color: black;
+        border: 0;
+      }
+      /* grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); */
 
-    .close {
-      background: none;
-      color: white;
-      border: 0;
-    }
+      .gallery {
+        display: grid;
+        /* we dont know how many columns we'll need so we use auto-fill to fill the space with as many columns as will fit and then fill the items in*/
+        grid-template-columns: repeat(auto-fill, 100px);
+        /*  dont know how many rows so we'll size the implicit rows created but we want a base dimension to be 100px by 100px*/
+        grid-auto-rows: 100px;
+        /* to make the grid fill in the empty space or atleast most of them / we'll load up a lot of 1x1 items to fill in the cracks below in the JS */
+        grid-auto-flow: dense;
+      }
+      /*  */
+      .item {
+        overflow: hidden;
+        display: grid;
+        /* instead of using position absolute to overlap items */
+        grid-template-columns: 1;
+        grid-template-rows: 1;
+      }
+      .item img {
+        grid-column: 1/-1;
+        grid-row: 1/-1;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+      .item__overlay {
+        /* overlap items by placing them on the same column and rows and then use z-index */
+        background: rgba(255, 255, 0, 0.5);
+        grid-column: 1/-1;
+        grid-row: 1/-1;
+        position: relative;
+        display: grid;
+        justify-items: center;
+        align-items: center;
+        /* use transform put at 100% but play with it to see what it does / slide something out of view so that we can set a hover to slide it INTO view*/
+        transform: translateY(100%);
+        transition: 150ms;
+      }
+      .item__overlay button {
+        background: none;
+        border: 2px solid white;
+        color: white;
+        text-transform: uppercase;
+        padding: 5px;
+      }
+      .item:hover .item__overlay {
+        transform: translateY(0);
+      }
+      /* give unique span values cooresponding to h and v classes */
+      .item.v2 {
+        grid-row: span 2;
+      }
+      .item.v3 {
+        grid-row: span 3;
+      }
+      .item.v4 {
+        grid-row: span 4;
+      }
+      .item.h2 {
+        grid-column: span 2;
+      }
+      .item.h3 {
+        grid-column: span 3;
+      }
+      .item.h4 {
+        grid-column: span 4;
+      }
 
-    .gallery {}
+      /* do i need img 100%? seems like it*/
+      /* img {
+        width: 100%;
+      } */
+      /* hide the button */
+      /* dont think its visibility */
+      /* button {
+        visibility: hidden;
+      } */
 
+      .overlay {
+        position: fixed;
+        background: rgba(0, 0, 0, 0.7);
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        display: none;
+        z-index: 2;
+      }
 
+      .overlay.open {
+        display: grid;
+        align-items: center;
+        justify-content: center;
+      }
 
-    .overlay {
-      position: fixed;
-      background: rgba(0, 0, 0, 0.7);
-      top: 0;
-      right: 0;
-      bottom: 0;
-      left: 0;
-      display: none;
-      z-index: 2;
-    }
+      .overlay-inner {
+        background: white;
+        width: 700px;
+        padding: 20px;
+      }
 
-    .overlay.open {
-      display: grid;
-    }
+      .overlay img {
+        width: 100%;
+      }
+    </style>
 
-    .overlay figure {
-      background: white;
-      width: 700px;
-      padding: 20px;
-    }
+    <script>
+      //select/get the gallery and the overlay
+      const gallery = document.querySelector(".gallery");
+      const overlay = document.querySelector(".overlay");
+      // need to select the image to resize it and the closebutton to close that img
+      const overlayImage = overlay.querySelector("img");
+      const overlayClose = overlay.querySelector(".close");
 
-    .overlay img {
-      width: 100%;
-    }
-  </style>
+      // this generates the pictures at various sizes that we will put in our grid
+      // array destructuring
+      function generateHTML([h, v]) {
+        return `<div class="item h${h} v${v}">
+                        <img src="images/${random(12)}.jpg" alt="image">
+                        <div class="item__overlay">
+                          <button>View -></button>
+                        </div>
+                      </div>
+                      `;
+      }
+      // random number generator
+      function random(limit) {
+        return Math.floor(Math.random() * limit) + 1;
+      }
+      const digits = Array.from({ length: 50 }, () => [
+        random(4),
+        random(4)
+      ]).concat([[1, 1], [1, 1], [1, 1], [1, 1], [1, 1]]);
+      // the extra 1x1 are to fill in any gaps or at least most of them
 
-  <script>
-  </script>
-</body>
+      const html = digits.map(generateHTML).join("");
+      console.log(html);
 
+      gallery.innerHTML = html;
+
+      // this is the intended results of the RNG + the html generator [<spanheight>,<spanwidth>]
+      /*
+      [
+        [1,2],
+        [4,1],
+        [2,3],
+        etc...
+      ]
+      */
+      //  function openOverlay() {
+      //    overlay.classList.add('open');
+      //  }
+      function closeOverlay() {
+        // hook this up to run when someone clicks out of the window or the ESC key
+        overlay.classList.remove("open");
+      }
+      //when someone clicks we can show the overlay
+      // selecting them here after they are created lets you not have to deal with event delegation
+      function handleClick(e) {
+        // console.log(e.currentTarget);
+        const src = e.currentTarget.querySelector("img").src;
+        // console.log(src);
+        overlayImage.src = src;
+        // openOverlay();
+        overlay.classList.add("open");
+      }
+
+      const items = document.querySelectorAll(".item");
+
+      items.forEach(item => {
+        item.addEventListener("click", handleClick);
+      });
+      overlayClose.addEventListener("click", closeOverlay);
+    </script>
+  </body>
 </html>
