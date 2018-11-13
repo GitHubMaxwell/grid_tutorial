@@ -8,7 +8,220 @@ button {
   padding: 10px 20px;
 }
 
+/* max-width  so that the content doesnt spill outside the container */
 img {
   max-width: 100%;
 }
+/* Wrapper */
+/* dont have to do margin top and bottom on any children if we target the parent most container and give it dip grid and gap/ this also will let us change the order of the rows to allow us to move the menu above the hero at mobile */
+.wrapper {
+  display: grid;
+  grid-gap: 20px;
+}
 
+/* Hero */
+.top {
+  display: grid;
+  grid-gap: 20px;
+  grid-template-areas:
+    "hero hero cta1"
+    "hero hero cta2";
+}
+
+.hero {
+  grid-area: hero;
+  min-height: 400px;
+  background: white url(images/taco.jpg);
+  background-size: cover;
+  background-position: bottom right;
+  padding: 50px;
+  /* but the yello background spans the length of the column and not the actual text so instead we can use flex box */
+  /* display: grid;
+  justify-content: start;
+  align-items: center; */
+  display: flex;
+  /* so they stack */
+  flex-direction: column;
+  /* pay attention to "content" */
+  justify-content: center;
+  align-items: start;
+}
+.hero > * {
+  background: var(--yellow);
+}
+.cta {
+  background: var(--yellow);
+  display: grid;
+  justify-items: center;
+  /* pay attention to "content" */
+  align-content: center;
+}
+.cta p {
+  margin: 0;
+}
+.cta1 {
+  grid-area: cta1;
+}
+.cta2 {
+  grid-area: cta2;
+}
+.price {
+  font-size: 60px;
+  font-weight: 300;
+}
+
+/* Navigation */
+
+.menu ul {
+  display: grid;
+  grid-gap: 10px;
+  /* want the menu items to take as much space as they can = auto-fit columns and minmax size / dont forget commas in minmax()*/
+  grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+  padding: 0;
+  /* margin: 20px 0; */
+  list-style: none;
+}
+
+/* style the a instead of the li */
+
+.menu a {
+  background: var(--yellow);
+  /* links are inline default */
+  display: block;
+  text-decoration: none;
+  padding: 10px;
+  text-align: center;
+  color: var(--black);
+  text-transform: uppercase;
+  font-size: 20px;
+}
+
+/* target attributes and their values */
+/* show it with mobile media queries */
+[aria-controls="menu-list"] {
+  display: none;
+}
+
+/* Features */
+
+.features {
+  display: grid;
+  grid-gap: 20px;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+}
+
+.feature {
+  background: white;
+  padding: 10px;
+  border: 1px solid white;
+  text-align: center;
+  box-shadow: 0 0 4px rgba(0, 0, 0, 0.1);
+}
+
+.feature .icon {
+  font-size: 50px;
+}
+
+.feature p {
+  color: rgba(0, 0, 0, 0.5);
+}
+
+/* About Section */
+
+.about {
+  background: white;
+  padding: 50px;
+  display: grid;
+  /* makes the feature blade have a static image and flexible text section */
+  grid-template-columns: 400px 1fr;
+  align-items: center;
+}
+
+/* Gallery */
+
+.gallery {
+  display: grid;
+  grid-gap: 20px;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+}
+.gallery h2 {
+  grid-column: 1 / -1;
+  /* use a :before and :after (considered grid items inside the element you declare them on  */
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  grid-gap: 20px;
+  align-items: center;
+}
+.gallery h2:before,
+.gallery h2:after {
+  display: block;
+  /* set content to nothing so that they count as actual items */
+  content: "";
+  height: 10px;
+  /* change this to a gradient */
+  /* background: #ffc600; */
+  /* background: linear-gradient(to left, var(--yellow), transparent); */
+  /* use a direction variable and that variable can have a default/fallback value*/
+  background: linear-gradient(
+    to var(--direction, left),
+    var(--yellow),
+    transparent
+  );
+}
+.gallery h2:after {
+  /* background: linear-gradient(to right, var(--yellow), transparent); */
+  /* or set a variable */
+  --direction: right;
+}
+
+.gallery img {
+  /* makes the items all the same width which is the dimension of the cells created by the grid?? */
+  width: 100%;
+}
+
+/* Media Queries */
+/*  what does "screen" do */
+@media (max-width: 1000px) {
+  .menu {
+    order: -1;
+  }
+  [aria-controls="menu-list"] {
+    display: block;
+    margin-bottom: 10px;
+  }
+  .menu ul {
+    max-height: 0;
+    transition: all 0.5s;
+    transform: rotateX(90deg);
+  }
+  /* tilda is like a future selector that if a ul does happen to come into existent apply these styles to it */
+  [aria-expanded="true"] ~ ul {
+    display: grid;
+    /* maxa-height is just so we can transition it / since it max height it wont take up all of it if the native height is less */
+    max-height: 500px;
+    transform: rotate(0);
+  }
+  [aria-expanded="false"] .close {
+    display: none;
+  }
+  [aria-expanded="true"] .close {
+    display: inline-block;
+  }
+  [aria-expanded="true"] .open {
+    display: none;
+  }
+}
+@media (max-width: 700px) {
+  .top {
+    grid-template-areas: "hero hero" "cta1 cta2";
+  }
+  /* About */
+  .about {
+    grid-template-columns: 1fr;
+  }
+}
+@media (max-width: 500px) {
+  .top {
+    grid-template-areas: "hero" "cta1" "cta2";
+  }
+}
